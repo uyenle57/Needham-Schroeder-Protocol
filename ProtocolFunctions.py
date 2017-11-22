@@ -77,13 +77,13 @@ def generatePublicKeyPair():
     return (publicKey, privateKey)
 
 
-def generateNonce(length=8):
+def generateNonce(length=2):
     """ Returns a pseudorandom number between 0-9"""
 
     # https://github.com/joestump/python-oauth2/blob/81326a07d1936838d844690b468660452aafdea9/oauth2/__init__.py#L165
 
     # return random.randint(0,9)
-    return ''.join([str(random.randint(0, 9)) for i in range(length)])
+    return int(''.join([str(random.randint(0, 9)) for i in range(length)]))
 
 def sign_certificate(name, privateKey, totient):
     return pow(name, privateKey, totient)
