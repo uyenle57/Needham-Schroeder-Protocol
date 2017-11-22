@@ -251,7 +251,7 @@ def menu():
 
         # Generate and Encrypt Alice's nonce with Bob's public key
         aliceNonce = generateNonce()
-        print(int(aliceNonce) )
+        print(int(aliceNonce))
 
         aliceNonceEncryptedWithBobPublicKey = rsaEncryption.encrypt(int(aliceNonce), int(decryptedBobCertificate[1]), int(decryptedBobCertificate[2]))
 
@@ -278,8 +278,8 @@ def menu():
 
                 # STEP 6:
                 # Bob decrypts Alice's certificate using the server's public key to get Alice's public key
-                decrypted_AliceCertificate = "".join(str(x) for x in [ chr(rsaDecryption.decrypt(c, Server_key_e, Server_key_n)) for c in aliceSignedPublicKey ])
-                decrypted_AliceCertificate = decrypted_AliceCertificate.split(',')
+                decryptedAliceCertificate = "".join(str(x) for x in [ chr(rsaDecryption.decrypt(c, Server_key_e, Server_key_n)) for c in aliceSignedPublicKey ])
+                decryptedAliceCertificate = decryptedAliceCertificate.split(',')
 
                 decryptedAliceNonce = rsaDecryption.decrypt(aliceNonceEncryptedWithBobPublicKey, Bob_key_d, Bob_key_n)
 
@@ -287,6 +287,12 @@ def menu():
 
                 # Generate and encrypt Bob's nonce
                 bobNonce = generateNonce()
+
+                aliceNonceWithBobsNonce = str(decryptedAliceNonce) + "," + str(bobNonce)
+
+                bobNonceEncryptedWithAlicePublicKey = [ rsaEncryption.encrypt(ord(c), int(decryptedAliceCertificate[1]), int(decryptedAliceCertificate[1])) for c in aliceNonceWithBobsNonce ]
+
+                print("bobNonceEncryptedWithAlicePublicKey", bobNonceEncryptedWithAlicePublicKey)
 
                 print("\nBOB: Dear Alice, here's my nonce and yours, proving I decrypted it")
 
@@ -304,4 +310,5 @@ def menu():
         # Delete nonces from working memory after use
         # del Alice_Nonce, encrypted_Alice_Nonce
         # del Bob_Nonce, encrypted_Bob_Nonce
+
 menu()

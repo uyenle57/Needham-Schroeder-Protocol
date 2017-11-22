@@ -68,9 +68,6 @@ def generatePublicKeyPair():
         print("ERROR: D is not coprime. Please try again.")
         sys.exit(1)
 
-    # print("key_e ", key_e)
-    # print("key_d", key_d)
-
     publicKey = (key_e, key_n)
     privateKey = (key_d, key_n)
 
