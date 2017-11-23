@@ -225,7 +225,7 @@ def menu():
         # ==================== NEEDHAM SCHROEDER PROTOCOL ==================== #
 
         # ----------------------- STEP 1 -----------------------
-        # Create certificate for Alice and Bob, which contains name : public key
+        # Create certificate for Alice and Bob, which contains { name : public key }
         certificate = {}
         certificate['Alice'] = Alice_PublicKey
         certificate['Bob'] = Bob_PublicKey
@@ -322,10 +322,10 @@ def menu():
             print(" | @BOB: Dear Alice, here's my nonce and yours, proving I decrypted it: " , bobNonceEncryptedWithAlicePublicKey, "|")
             print(" |___________________________________________________________________________________________|")
 
+
             # ----------------------- STEP 7 -----------------------
 
             # TO DO
-
             # Alice decrypts Bob's nonce (with her private key)
             decryptedBobNonce = "".join(str(x) for x in [ chr(rsaDecryption.decrypt(c, Alice_key_d, Alice_key_n)) for c in bobNonceEncryptedWithAlicePublicKey ])
             decryptedBobNonce = decryptedBobNonce.split(',')

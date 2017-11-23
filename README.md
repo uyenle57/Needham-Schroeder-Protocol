@@ -4,12 +4,12 @@ Implementation of asymmetric Needham-Schroeder Protocol Protocol in Python.
 <br>
 
 ### Prerequisites:
-• [Python >= 2.7](https://www.python.org/downloads/)
+• [Python >= 3.6](https://www.python.org/downloads/)
 
 ### Running the program:
-Verify you have Python 2.7:
+Verify you have Python 3.6:
 ```
-python --version
+python3 --version
 ```
 
 #### Windows
