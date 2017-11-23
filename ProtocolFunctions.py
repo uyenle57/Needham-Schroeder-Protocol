@@ -37,11 +37,11 @@ def generatePublicKeyPair():
     # Generate key e
     coPrimeList = []
 
-    for i in range(1, phiN):
+    for i in range(2, phiN):
         if(rsaEncryption.isCoPrime([i, phiN])):
             coPrimeList.append(i)
 
-    key_e = coPrimeList[random.randint(coPrimeList[0], len(coPrimeList)-1)]
+    key_e = coPrimeList[random.randint(0, len(coPrimeList) - 1)]
 
     # Verify e is coprime to phiN
     if gcd(key_e, phiN) == 1:

@@ -27,7 +27,7 @@ class RsaEncryption():
     def generateRandPrime(self):
         """ Returns a randomly generated prime number between 2 and 100 """
         while True:
-            self.num = secrets.randbelow(200)
+            self.num = secrets.randbelow(100)
             if(self.isPrime(self.num)):
                 return self.num
 
