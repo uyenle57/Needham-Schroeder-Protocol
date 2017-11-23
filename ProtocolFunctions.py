@@ -75,9 +75,8 @@ def generatePublicKeyPair():
 
 
 def generateNonce(length=2):
-    """ Returns a pseudorandom number between 0-9"""
+    """ Returns a 2 bits pseudorandom number"""
 
     # https://github.com/joestump/python-oauth2/blob/81326a07d1936838d844690b468660452aafdea9/oauth2/__init__.py#L165
 
-    # return random.randint(0,9)
     return int(''.join([str(random.randint(0, 9)) for i in range(length)]))

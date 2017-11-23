@@ -248,13 +248,13 @@ def menu():
 
         decryptedBobCertificate = "".join(str(x) for x in [ chr(rsaDecryption.decrypt(c, Server_key_e, Server_key_n)) for c in bobSignedPublicKey ])
 
-        print("Decrypted Bob certificate: ", decryptedBobCertificate)
+        print("\nDecrypted Bob's certificate: ", decryptedBobCertificate)
 
         # Verify
         if str(decryptedBobCertificate) == bobCertificate:
-            print("Verified decrypted Bob certificate is correct.\n")
+            print("Verified decrypted Bob's certificate is correct.\n")
         else:
-            print("ERROR: Decrypted Bob certificate is not correct. Please try again.")
+            print("ERROR: Decrypted Bob's certificate is not correct. Please try again.")
             sys.exit(1)
 
         decryptedBobCertificate = decryptedBobCertificate.split(',')
@@ -263,10 +263,11 @@ def menu():
         # ----------------------- STEP 3 -----------------------
         # Generate and encrypt Alice's nonce (with Bob public key)
         aliceNonce = generateNonce()
-        print("Alice nonce: ", int(aliceNonce))
+        print("Alice's nonce: ", int(aliceNonce))
 
         aliceNonceEncryptedWithBobPublicKey = rsaEncryption.encrypt(int(aliceNonce), int(decryptedBobCertificate[1]), int(decryptedBobCertificate[2]))
 
+        # and send it to Bob
         print("\n@ALICE: Dear Bob, this is Alice and I've sent you a nonce only you can read:" , aliceNonceEncryptedWithBobPublicKey)
 
         aliceSendNonceToBob = str(input("Press 's' and enter to send your nonce to Bob:"))
@@ -280,13 +281,21 @@ def menu():
             print ("\n@BOB: Dear Server, this is Bob and I'd like to get Alice's public key.")
 
             # ----------------------- STEP 5 -----------------------
-            # Sign Alice certificate (with Server private key) (authentication)
+            # Sign Alice certificate (with Server private key) (authentication) and send it to Bob
             aliceSignedPublicKey = [ rsaEncryption.encrypt(ord(c), Server_key_d, Server_key_n) for c in aliceCertificate ]
             print("\n@SERVER: Dear Bob, here's Alice's public key signed by me: " , aliceSignedPublicKey)
 
             # ----------------------- STEP 6 -----------------------
             # Bob decrypts Alice's certificate (with Server public key) to get Alice's public key
             decryptedAliceCertificate = "".join(str(x) for x in [ chr(rsaDecryption.decrypt(c, Server_key_e, Server_key_n)) for c in aliceSignedPublicKey ])
+
+            # Verify
+            if str(decryptedAliceCertificate) == aliceCertificate:
+                print("Verified decrypted Alice's certificate is correct.\n")
+            else:
+                print("ERROR: Decrypted Alice's certificate is not correct. Please try again.")
+                sys.exit(1)
+
             decryptedAliceCertificate = decryptedAliceCertificate.split(',')
 
             # Bob decrypts Alice's nonce (with his private key)
@@ -320,30 +329,27 @@ def menu():
             # TO DO
             # Alice decrypts Bob's nonce (with her private key)
             decryptedBobNonce = "".join(str(x) for x in [ chr(rsaDecryption.decrypt(c, Alice_key_d, Alice_key_n)) for c in bobNonceEncryptedWithAlicePublicKey ])
-            decryptedBobNonce = decryptedBobNonce.split(',')
 
             print("decryptedBobNonce ", decryptedBobNonce)
 
-            # Validate decrypted Bob's nonce matches
+            # Verify
             if decryptedBobNonce == bobNonce:
                 print("Verified decrypted Bob nonce is correct\n")
-                sys.exit(0)
             else:
                 print("ERROR: Decrypted Bob nonce is not correct. Please try again.")
                 sys.exit(1)
 
-            # Encrypt Bob's nonce (with Bob's public key) and send it back to him
+            decryptedBobNonce = decryptedBobNonce.split(',')
+
+            # Alice encrypts Bob's nonce (with Bob's public key) and send it back to him
             encryptBobNonce = [ rsaEncryption.encrypt(ord(c), Bob_key_e, Bob_key_n) for c in decryptedBobNonce ]
 
             print("\n@ALICE: Dear Bob, here's your nonce proving I decrypted it: " , encryptBobNonce)
 
             # Delete nonces from working memory as nonces are used only once
-            del aliceNonce
-            del decryptedAliceNonce
-            del bobNonce
-            del decryptedBobNonce
+            del aliceNonce, decryptedAliceNonce, bobNonce, decryptedBobNonce
 
-            print("Protocol transmission successful.")
+            print("\nProtocol transmission successful.")
             sys.exit(0)
 
 menu()
