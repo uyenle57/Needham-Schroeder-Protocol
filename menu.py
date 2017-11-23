@@ -247,12 +247,18 @@ def menu():
         rsaDecryption = RsaDecryption()
 
         decryptedBobCertificate = "".join(str(x) for x in [ chr(rsaDecryption.decrypt(c, Server_key_e, Server_key_n)) for c in bobSignedPublicKey ])
-        print("decryptedBobCertificate:", decryptedBobCertificate)
-        decryptedBobCertificate = decryptedBobCertificate.split(',')
 
         print("Decrypted Bob certificate: ", decryptedBobCertificate)
 
-        # TO DO: Verify
+        # Verify
+        if str(decryptedBobCertificate) == bobCertificate:
+            print("Verified decrypted Bob certificate is correct.\n")
+        else:
+            print("ERROR: Decrypted Bob certificate is not correct. Please try again.")
+            sys.exit(1)
+
+        decryptedBobCertificate = decryptedBobCertificate.split(',')
+
 
         # ----------------------- STEP 3 -----------------------
         # Generate and encrypt Alice's nonce (with Bob public key)
@@ -288,7 +294,7 @@ def menu():
 
             print("Decrypted Alice nonce: ", decryptedAliceNonce)
 
-            #Verify decrypted Alice's nonce is correct
+            #Verify
             if decryptedAliceNonce == aliceNonce:
                 print("Verified decrypted Alice nonce is correct.\n")
             else:
