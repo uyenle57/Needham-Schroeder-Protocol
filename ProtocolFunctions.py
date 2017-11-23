@@ -81,6 +81,3 @@ def generateNonce(length=2):
 
     # return random.randint(0,9)
     return int(''.join([str(random.randint(0, 9)) for i in range(length)]))
-
-def sign_certificate(name, privateKey, totient):
-    return pow(name, privateKey, totient)

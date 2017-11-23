@@ -1,5 +1,5 @@
 # Needham-Schroeder Protocol
-Implementation of asymmetric Needham-Schroeder Protocol Protocol in Python.
+Implementation of asymmetric Needham-Schroeder Protocol in Python.
 
 <br>
 

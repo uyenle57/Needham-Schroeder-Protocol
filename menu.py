@@ -13,9 +13,7 @@ def menu():
         by Uyen Le (tle004)
         ==========================================================================
 
-         .____________________________________________________________________________.
-         | @ALICE: Dear Server, this is Alice and I'd like to get Bob's public key.   |
-         |____________________________________________________________________________|
+        @ALICE: Dear Server, this is Alice and I'd like to get Bob's public key.
     """))
 
     aliceSendRequestToServer = str(input("Press 's' and enter to request the server for Bob's public key:"))
@@ -241,9 +239,7 @@ def menu():
         bobSignedPublicKey = [ rsaEncryption.encrypt(ord(c), Server_key_d, Server_key_n) for c in bobCertificate ]
 
         # Send Bob's public key to Alice
-        print(" .____________________________________________________________________________________________________________________________.")
-        print(" | @SERVER: Dear Alice, this is Bob's public key signed by me: " , bobSignedPublicKey, "|")
-        print(" |____________________________________________________________________________________________________________________________|")
+        print("\n@SERVER: Dear Alice, this is Bob's public key signed by me: " , bobSignedPublicKey)
 
 
         # ----------------------- STEP 2 -----------------------
@@ -265,9 +261,7 @@ def menu():
 
         aliceNonceEncryptedWithBobPublicKey = rsaEncryption.encrypt(int(aliceNonce), int(decryptedBobCertificate[1]), int(decryptedBobCertificate[2]))
 
-        print(" .___________________________________________________________________________________.")
-        print(" | @ALICE: Dear Bob, this is Alice and I've sent you a nonce only you can read." , aliceNonceEncryptedWithBobPublicKey, "|")
-        print(" |___________________________________________________________________________________|")
+        print("\n@ALICE: Dear Bob, this is Alice and I've sent you a nonce only you can read:" , aliceNonceEncryptedWithBobPublicKey)
 
         aliceSendNonceToBob = str(input("Press 's' and enter to send your nonce to Bob:"))
 
@@ -277,18 +271,12 @@ def menu():
         else:
 
             # ----------------------- STEP 4 -----------------------
-            print (textwrap.dedent("""
-             .________________________________________________________________________.
-             | @BOB: Dear Server, this is Bob and I'd like to get Alice's public key. |
-             |________________________________________________________________________|
-            """))
+            print ("\n@BOB: Dear Server, this is Bob and I'd like to get Alice's public key.")
 
             # ----------------------- STEP 5 -----------------------
             # Sign Alice certificate (with Server private key) (authentication)
             aliceSignedPublicKey = [ rsaEncryption.encrypt(ord(c), Server_key_d, Server_key_n) for c in aliceCertificate ]
-            print(" .____________________________________________________________________________________________________________________________.")
-            print(" | @SERVER: Dear Bob, here's Alice's public key signed by me: " , aliceSignedPublicKey, "|")
-            print(" |____________________________________________________________________________________________________________________________|")
+            print("\n@SERVER: Dear Bob, here's Alice's public key signed by me: " , aliceSignedPublicKey)
 
             # ----------------------- STEP 6 -----------------------
             # Bob decrypts Alice's certificate (with Server public key) to get Alice's public key
@@ -318,9 +306,7 @@ def menu():
 
             bobNonceEncryptedWithAlicePublicKey = [ rsaEncryption.encrypt(ord(c), int(decryptedAliceCertificate[1]), int(decryptedAliceCertificate[1])) for c in aliceNonceWithBobsNonce ]
 
-            print(" .___________________________________________________________________________________________.")
-            print(" | @BOB: Dear Alice, here's my nonce and yours, proving I decrypted it: " , bobNonceEncryptedWithAlicePublicKey, "|")
-            print(" |___________________________________________________________________________________________|")
+            print("\n@BOB: Dear Alice, here's my nonce and yours, proving I decrypted it: " , bobNonceEncryptedWithAlicePublicKey)
 
 
             # ----------------------- STEP 7 -----------------------
@@ -330,24 +316,28 @@ def menu():
             decryptedBobNonce = "".join(str(x) for x in [ chr(rsaDecryption.decrypt(c, Alice_key_d, Alice_key_n)) for c in bobNonceEncryptedWithAlicePublicKey ])
             decryptedBobNonce = decryptedBobNonce.split(',')
 
-            print(" .__________________________________________________________________________.")
-            print(" | @ALICE: Dear Bob, here's your nonce proving I decrypted it: " , decryptedBobNonce, "|")
-            print(" |__________________________________________________________________________|")
+            print("decryptedBobNonce ", decryptedBobNonce)
 
             # Validate decrypted Bob's nonce matches
-            # if so successfully exits
             if decryptedBobNonce == bobNonce:
-                print("Verified decrypted Bob nonce is correct. Protocol transmission successful.\n")
+                print("Verified decrypted Bob nonce is correct\n")
                 sys.exit(0)
             else:
                 print("ERROR: Decrypted Bob nonce is not correct. Please try again.")
                 sys.exit(1)
 
+            # Encrypt Bob's nonce (with Bob's public key) and send it back to him
+            encryptBobNonce = [ rsaEncryption.encrypt(ord(c), Bob_key_e, Bob_key_n) for c in decryptedBobNonce ]
 
-        # Delete nonces from working memory as nonces are used only once
-        del aliceNonce
-        del decryptedAliceNonce
-        del bobNonce
-        del decryptedBobNonce
+            print("\n@ALICE: Dear Bob, here's your nonce proving I decrypted it: " , encryptBobNonce)
+
+            # Delete nonces from working memory as nonces are used only once
+            del aliceNonce
+            del decryptedAliceNonce
+            del bobNonce
+            del decryptedBobNonce
+
+            print("Protocol transmission successful.")
+            sys.exit(0)
 
 menu()
