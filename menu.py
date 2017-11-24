@@ -19,36 +19,41 @@ def menu():
     # Generate Alice public key pair
     alicePublicKeyPair = generatePublicKeyPair()
 
-    Alice_PublicKey = alicePublicKeyPair[0]
-    Alice_PrivateKey = alicePublicKeyPair[1]
-    Alice_key_e = Alice_PublicKey[0]
-    Alice_key_n = Alice_PublicKey[1]
-    Alice_key_d = Alice_PrivateKey[0]
+    alicePublicKey = alicePublicKeyPair[0]
+    alicePrivateKey = alicePublicKeyPair[1]
+    aliceKeyE = alicePublicKey[0]
+    aliceKeyN = alicePublicKey[1]
+    aliceKeyD = alicePrivateKey[0]
 
     # Generate Bob's public key pair
     bobPublicKeyPair = generatePublicKeyPair()
 
-    Bob_PublicKey = bobPublicKeyPair[0]
-    Bob_PrivateKey = bobPublicKeyPair[1]
-    Bob_key_e = Bob_PublicKey[0]
-    Bob_key_n = Bob_PublicKey[1]
-    Bob_key_d = Bob_PrivateKey[0]
+    bobPublicKey = bobPublicKeyPair[0]
+    bobPrivateKey = bobPublicKeyPair[1]
+    bobKeyE = bobPublicKey[0]
+    bobKeyN = bobPublicKey[1]
+    bobKeyD = bobPrivateKey[0]
 
     # Generate Server's public key pair
     serverPublicKeyPair = generatePublicKeyPair()
 
-    server_PublicKey = serverPublicKeyPair[0]
-    server_PrivateKey = serverPublicKeyPair[1]
-    Server_key_e = server_PublicKey[0]
-    Server_key_n = server_PublicKey[1]
-    Server_key_d = server_PrivateKey[0]
+    serverPublicKey = serverPublicKeyPair[0]
+    serverPrivateKey = serverPublicKeyPair[1]
+    serverKeyE = serverPublicKey[0]
+    serverKeyN = serverPublicKey[1]
+    serverKeyD = serverPrivateKey[0]
 
+    # Create Alice and Bob certificates which contains { name : public key }
     certificate = {}
-    certificate['Alice'] = Alice_PublicKey
-    certificate['Bob'] = Bob_PublicKey
+    certificate['Alice'] = alicePublicKey
+    certificate['Bob'] = bobPublicKey
+
+    # Convert certificate from Hash Map to string for encryption
+    aliceCertificate = "Alice," + str(certificate['Alice'][0]) + "," + str(certificate['Alice'][1])
+    bobCertificate = "Bob," + str(certificate['Bob'][0]) + "," + str(certificate['Bob'][1])
 
     print("Server: Key Distribution Center initialised with Alice's and Bob's certificates: ", certificate)
-    print("Server: Key Distribution Center public key: ", server_PublicKey, "\n")
+    print("Server: Key Distribution Center public key: ", serverPublicKey, "\n")
 
     aliceSendRequestToServer = str(input("Press 's' to start protocol:"))
 
@@ -57,43 +62,37 @@ def menu():
         sys.exit(1)
     else:
 
+        print("\nSTARTING PROTOCOL. CONNECTION OPENED.\n")
+
         # ----------------------- STEP 1 -----------------------
-        # Create certificate for Alice and Bob, which contains { name : public key }
-        certificate = {}
-        certificate['Alice'] = Alice_PublicKey
-        certificate['Bob'] = Bob_PublicKey
-
-        print("S: Certificate Store: ", certificate)
-
-        # Convert certificate from Hash Map to string for encryption
-        aliceCertificate = "Alice," + str(certificate['Alice'][0]) + "," + str(certificate['Alice'][1])
-        bobCertificate = "Bob," + str(certificate['Bob'][0]) + "," + str(certificate['Bob'][1])
-
         print("\n@ALICE: Dear Server, this is Alice and I'd like to get Bob's public key.")
 
-        # Sign Bob certificate (with Server private key) (authentication)
+        # Server signs Bob's certificate (with Server private key) (authentication)
         rsaEncryption = RsaEncryption()
-        bobSignedPublicKey = [ rsaEncryption.encrypt(ord(c), Server_key_d, Server_key_n) for c in bobCertificate ]
-
-        # Send Bob's public key to Alice
-        print("@SERVER: Dear Alice, this is Bob's public key signed by me: " , bobSignedPublicKey)
+        bobSignedCertificate = [ rsaEncryption.encrypt(ord(c), serverKeyD, serverKeyN) for c in bobCertificate ]
 
 
         # ----------------------- STEP 2 -----------------------
+        # Send Bob's signed certificate to Alice
+        print("@SERVER: Dear Alice, this is Bob's public key signed by me: " , bobSignedCertificate)
+
         # Alice decrypts Bob's certificate (with Server public key) to get Bob's public key
         rsaDecryption = RsaDecryption()
 
-        decryptedBobCertificate = "".join(str(x) for x in [ chr(rsaDecryption.decrypt(c, Server_key_e, Server_key_n)) for c in bobSignedPublicKey ])
+        decryptedBobCertificate = "".join(str(x) for x in [ chr(rsaDecryption.decrypt(c, serverKeyE, serverKeyN)) for c in bobSignedCertificate ])
 
         decryptedBobCertificate = decryptedBobCertificate.split(',')
         print("Alice decrypts Bob's certificate: ", decryptedBobCertificate)
 
-        # ----------------------- STEP 3 -----------------------
-        # Generate and encrypt Alice's nonce (with Bob public key)
+        # Generate Alice's nonce
         aliceNonce = generateNonce()
+
+        # Alice encrypts her nonce (with Bob's public key she just decrypted)
         aliceNonceEncryptedWithBobPublicKey = rsaEncryption.encrypt(int(aliceNonce), int(decryptedBobCertificate[1]), int(decryptedBobCertificate[2]))
 
-        # and send it to Bob
+
+        # ----------------------- STEP 3 -----------------------
+        # Alice sends her encrypted nonce to Bob
         print("\n@ALICE: Dear Bob, this is Alice and I've sent you a nonce only you can read.")
         print("Alice's nonce plaintext: ", aliceNonce)
         print("Alice's nonce encrypted with Bob's public key: ", aliceNonceEncryptedWithBobPublicKey)
@@ -108,37 +107,40 @@ def menu():
             # ----------------------- STEP 4 -----------------------
             print ("\n@BOB: Dear Server, this is Bob and I'd like to get Alice's public key.")
 
-            # ----------------------- STEP 5 -----------------------
-            # Sign Alice certificate (with Server private key) (authentication) and send it to Bob
-            aliceSignedPublicKey = [ rsaEncryption.encrypt(ord(c), Server_key_d, Server_key_n) for c in aliceCertificate ]
-            print("\n@SERVER: Dear Bob, here's Alice's public key signed by me: " , aliceSignedPublicKey)
+            # Server signs Alice's certificate (with Server private key) (authentication)
+            aliceSignedCertificate = [ rsaEncryption.encrypt(ord(c), serverKeyD, serverKeyN) for c in aliceCertificate ]
 
-            # ----------------------- STEP 6 -----------------------
+
+            # ----------------------- STEP 5 -----------------------
+            # Server sends Alice's signed certificate to Bob
+            print("\n@SERVER: Dear Bob, here's Alice's public key signed by me: " , aliceSignedCertificate)
+
             # Bob decrypts Alice's certificate (with Server public key) to get Alice's public key
-            decryptedAliceCertificate = "".join(str(x) for x in [ chr(rsaDecryption.decrypt(c, Server_key_e, Server_key_n)) for c in aliceSignedPublicKey ])
+            decryptedAliceCertificate = "".join(str(x) for x in [ chr(rsaDecryption.decrypt(c, serverKeyE, serverKeyN)) for c in aliceSignedCertificate ])
             decryptedAliceCertificate = decryptedAliceCertificate.split(',')
             print("Bob decrypts Alice's certificate: ", decryptedAliceCertificate)
 
             # Bob decrypts Alice's nonce (with his private key)
-            decryptedAliceNonce = rsaDecryption.decrypt(aliceNonceEncryptedWithBobPublicKey, Bob_key_d, Bob_key_n)
-
+            decryptedAliceNonce = rsaDecryption.decrypt(aliceNonceEncryptedWithBobPublicKey, bobKeyD, bobKeyN)
             print("Bob decrypts Alice's nonce: ", decryptedAliceNonce)
 
             # Generate Bob nonce
             bobNonce = generateNonce()
 
-            # Add Alice's nonce with Bob's nonce and encrypt it (with Alice public key)
+            # Add decrypted Alice's nonce with Bob's nonce and encrypt it (with Alice public key)
             aliceNonceWithBobsNonce = str(decryptedAliceNonce) + "," + str(bobNonce)
             print("Alice's nonce with Bob's nonce: ", aliceNonceWithBobsNonce)
 
+            # Bob encrypts his nonce plus decrypted Alice's nonce
+            # using Alice's public key he just decrypted
             bobNonceEncryptedWithAlicePublicKey = [ rsaEncryption.encrypt(ord(c), int(decryptedAliceCertificate[1]), int(decryptedAliceCertificate[2])) for c in aliceNonceWithBobsNonce ]
 
+            # ----------------------- STEP 6 -----------------------
+            # Bob sends his nonce plus decrypted Alice's nonce back to Alice
             print("\n@BOB: Dear Alice, here's my nonce and yours, proving I decrypted it: " , bobNonceEncryptedWithAlicePublicKey)
 
-
-            # ----------------------- STEP 7 -----------------------
             # Alice decrypts Bob's nonce (with her private key)
-            decryptedAliceNonceFromBob = "".join(str(x) for x in [ chr(rsaDecryption.decrypt(c, Alice_key_d, Alice_key_n)) for c in bobNonceEncryptedWithAlicePublicKey ])
+            decryptedAliceNonceFromBob = "".join(str(x) for x in [ chr(rsaDecryption.decrypt(c, aliceKeyD, aliceKeyN)) for c in bobNonceEncryptedWithAlicePublicKey ])
             decryptedAliceNonceFromBob = decryptedAliceNonceFromBob.split(",")
 
             print("\nDecrypted Alive Nonce From Bob: ", decryptedAliceNonceFromBob)
@@ -150,13 +152,15 @@ def menu():
                 print("ERROR: Decrypted Alice's nonce from Bob is not correct. Please try again.")
                 sys.exit(1)
 
+            # Alice encrypts Bob's nonce (with Bob's public key)
+            encryptBobNonceToSendBack = [ rsaEncryption.encrypt(ord(c), bobKeyE, bobKeyN) for c in decryptedAliceNonceFromBob[1] ]
 
-            # Alice encrypts Bob's nonce (with Bob's public key) and send it back to him
-            encryptBobNonceToSendBack = [ rsaEncryption.encrypt(ord(c), Bob_key_e, Bob_key_n) for c in decryptedAliceNonceFromBob[1] ]
 
+            # ----------------------- STEP 7 -----------------------
+            # Alice sends final encrypted Bob's nonce back to Bob
             print("@ALICE: Dear Bob, here's your nonce proving I decrypted it: " , encryptBobNonceToSendBack)
 
-            finalBobNonceFromAlice = "".join(str(x) for x in [ chr(rsaDecryption.decrypt(c, Bob_key_d, Bob_key_n)) for c in encryptBobNonceToSendBack ])
+            finalBobNonceFromAlice = "".join(str(x) for x in [ chr(rsaDecryption.decrypt(c, bobKeyD, bobKeyN)) for c in encryptBobNonceToSendBack ])
 
             print("\nBob decrypts nonce from Alice: ", finalBobNonceFromAlice)
 
