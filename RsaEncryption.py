@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-#
 
 import sys, re
-import random, secrets
+import random
 from array import *
 from math import gcd
 from itertools import combinations
-
 
 class RsaEncryption():
 
@@ -25,9 +24,9 @@ class RsaEncryption():
         return True
 
     def generateRandPrime(self):
-        """ Returns a randomly generated prime number between 2 and 100 """
+        """ Returns a randomly generated prime number between 2 and 200 """
         while True:
-            self.num = secrets.randbelow(100)
+            self.num = random.randint(2, 200)
             if(self.isPrime(self.num)):
                 return self.num
 

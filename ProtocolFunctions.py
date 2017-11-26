@@ -2,7 +2,6 @@
 
 from RsaEncryption import *
 from RsaDecryption import *
-import string, random
 
 
 def generatePublicKeyPair():
@@ -55,6 +54,7 @@ def generatePublicKeyPair():
 
     # ensure key e and d are distinct
     while key_e == key_d:
+        key_e = coPrimeList[random.randint(0, len(coPrimeList) - 1)]
         _, key_d, _ = rsaEncryption.egcd(key_e, phiN)
 
     # ensure key d is positive

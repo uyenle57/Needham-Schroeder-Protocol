@@ -147,7 +147,7 @@ def menu():
             decryptedAliceNonceFromBob = "".join(str(x) for x in [ chr(rsaDecryption.decrypt(c, aliceKeyD, aliceKeyN)) for c in bobNonceEncryptedWithAlicePublicKey ])
             decryptedAliceNonceFromBob = decryptedAliceNonceFromBob.split(",")
 
-            print("\nDecrypted Alive Nonce From Bob: ", decryptedAliceNonceFromBob)
+            print("\nDecrypted Alice Nonce From Bob: ", decryptedAliceNonceFromBob)
 
 
             # Verify
