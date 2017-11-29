@@ -29,6 +29,6 @@ python3 menu.py
 <br>
 
 ---
-Computer Security Coursework: Part 2 - Needham-Schroeder Protocol
+Computer Security Coursework: Part 2 - Needham-Schroeder Protocol  
 1 December 2017  
 Goldsmiths, University of London
