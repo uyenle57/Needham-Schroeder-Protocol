@@ -17,7 +17,7 @@ def menu():
     # GENERATE PUBLIC KEY PAIR FOR ALICE, BOB AND SERVER
 
     # Generate Alice public key pair
-    alicePublicKeyPair = generatePublicKeyPair()
+    alicePublicKeyPair = generate_public_keypair()
 
     alicePublicKey = alicePublicKeyPair[0]
     alicePrivateKey = alicePublicKeyPair[1]
@@ -26,7 +26,7 @@ def menu():
     aliceKeyD = alicePrivateKey[0]
 
     # Generate Bob's public key pair
-    bobPublicKeyPair = generatePublicKeyPair()
+    bobPublicKeyPair = generate_public_keypair()
 
     bobPublicKey = bobPublicKeyPair[0]
     bobPrivateKey = bobPublicKeyPair[1]
@@ -35,7 +35,7 @@ def menu():
     bobKeyD = bobPrivateKey[0]
 
     # Generate Server's public key pair
-    serverPublicKeyPair = generatePublicKeyPair()
+    serverPublicKeyPair = generate_public_keypair()
 
     serverPublicKey = serverPublicKeyPair[0]
     serverPrivateKey = serverPublicKeyPair[1]

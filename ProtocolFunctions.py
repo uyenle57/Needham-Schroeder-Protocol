@@ -4,31 +4,31 @@ from RsaEncryption import *
 from RsaDecryption import *
 
 
-def generatePublicKeyPair():
+def generate_public_keypair():
     """Return public and private key tuple"""
 
     rsaEncryption = RsaEncryption()
 
-    key_p = rsaEncryption.generateRandPrime()
-    key_q = rsaEncryption.generateRandPrime()
+    key_p = rsaEncryption.generate_randPrime()
+    key_q = rsaEncryption.generate_randPrime()
 
     while key_q == key_p:
-        key_q = rsaEncryption.generateRandPrime()
+        key_q = rsaEncryption.generate_randPrime()
 
-    if rsaEncryption.isPrime(key_p):
+    if rsaEncryption.is_prime(key_p):
         pass
     else:
         print("ERROR: p is not prime. Please try again.")
         sys.exit(1)
 
-    if rsaEncryption.isPrime(key_q):
+    if rsaEncryption.is_prime(key_q):
         pass
     else:
         print("ERROR: q is not prime. Please try again.")
         sys.exit(1)
 
     # Calculate key n
-    key_n = rsaEncryption.calculateN(key_p, key_q)
+    key_n = rsaEncryption.calculate_n(key_p, key_q)
 
     # Calculate phi(n)
     phiN = rsaEncryption.totient(key_p, key_q)
@@ -37,7 +37,7 @@ def generatePublicKeyPair():
     coPrimeList = []
 
     for i in range(2, phiN):
-        if(rsaEncryption.isCoPrime([i, phiN])):
+        if(rsaEncryption.is_coprime([i, phiN])):
             coPrimeList.append(i)
 
     key_e = coPrimeList[random.randint(0, len(coPrimeList) - 1)]
