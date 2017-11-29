@@ -58,7 +58,7 @@ def menu():
 
     aliceSendRequestToServer = str(input("Press 's' to start protocol:"))
 
-    if not aliceSendRequestToServer:
+    if not aliceSendRequestToServer == 's':
         print("ERROR: Protocol not started. Please try again.")
         sys.exit(1)
     else:
@@ -102,7 +102,7 @@ def menu():
 
         aliceSendNonceToBob = str(input("\nPress 's' to send your nonce to Bob:"))
 
-        if not aliceSendNonceToBob:
+        if not aliceSendNonceToBob == 's':
             print("ERROR: Nonce not sent. Please try again.")
             sys.exit(1)
         else:
